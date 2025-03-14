@@ -12,16 +12,26 @@ load_dotenv()
 st.set_page_config(page_title="AutoGen Chatbot", page_icon="🤖", layout="wide")
 st.title("AutoGen Azure OpenAI Chatbot")
 
-# Load team configuration
-with open('team-config.json', 'r') as f:
-    team_config = json.load(f)
-
-# Initialize session state
-if 'messages' not in st.session_state:
+# Initialize session state variables
+if "messages" not in st.session_state:
     st.session_state.messages = []
-    
-if 'chat_initialized' not in st.session_state:
+
+if "chat_initialized" not in st.session_state:
     st.session_state.chat_initialized = False
+
+if "manager" not in st.session_state:
+    st.session_state.manager = None
+
+if "agents" not in st.session_state:
+    st.session_state.agents = None
+
+# Load team configuration
+@st.cache_resource
+def load_team_config():
+    with open('team-config.json', 'r') as f:
+        return json.load(f)
+
+team_config = load_team_config()
 
 def initialize_chat():
     # Configure OpenAI
@@ -118,7 +128,7 @@ if st.button("Send"):
         except Exception as e:
             st.error(f"Error getting response: {str(e)}")
         
-        # Clear input
+        # Clear input using the form_submit_button
         st.session_state.user_input = ""
 
 # Display chat history
